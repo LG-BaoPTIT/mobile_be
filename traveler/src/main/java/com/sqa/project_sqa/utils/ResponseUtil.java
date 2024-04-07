@@ -10,8 +10,8 @@ public class ResponseUtil {
         return new ResponseEntity<String>("{\"Message\":\""+responseMessage+"\"}",httpStatus);
     }
 
-    public static ResponseEntity<String> getResponseEntity(String errorCode, String errorMessage, HttpStatus httpStatus){
-        String response = "{\"code\": \"" + errorCode + "\", \"message\": \"" + errorMessage + "\"}";
+    public static ResponseEntity<String> getResponseEntity(String code, String errorMessage, HttpStatus httpStatus){
+        String response = "{\"code\": \"" + code + "\", \"message\": \"" + errorMessage + "\"}";
         return new ResponseEntity<>(response, httpStatus);
     }
 }

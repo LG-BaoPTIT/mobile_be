@@ -3,6 +3,7 @@ package com.sqa.project_sqa.service.serviceImpl;
 import com.sqa.project_sqa.constants.RegexConstants;
 import com.sqa.project_sqa.entities.ERole;
 import com.sqa.project_sqa.entities.User;
+import com.sqa.project_sqa.payload.dto.UserDTO;
 import com.sqa.project_sqa.payload.request.LoginRequest;
 import com.sqa.project_sqa.payload.request.SignupRequest;
 import com.sqa.project_sqa.payload.response.JwtResponse;
@@ -10,6 +11,7 @@ import com.sqa.project_sqa.repositories.UserRepository;
 import com.sqa.project_sqa.security.CustomUserDetailsService;
 import com.sqa.project_sqa.security.jwt.JwtUtil;
 import com.sqa.project_sqa.service.UserService;
+import com.sqa.project_sqa.utils.ResponseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,15 +56,15 @@ public class UserServiceImpl implements UserService {
             if(validateSignUp(signupRequest)){
 
                 if (userRepository.existsByEmail(signupRequest.getEmail())) {
-                    return new ResponseEntity<>("Email is already registered", HttpStatus.BAD_REQUEST);
+                    return ResponseUtil.getResponseEntity("01","Email is already registered",HttpStatus.BAD_REQUEST);
                 }
 
                 if (userRepository.existsByPhone(signupRequest.getPhone())) {
-                    return new ResponseEntity<>("Phone number is already registered", HttpStatus.BAD_REQUEST);
+                    return ResponseUtil.getResponseEntity("02","Phone number is already registered",HttpStatus.BAD_REQUEST);
                 }
 
-                if (userRepository.existsByUserName(signupRequest.getPhone())) {
-                    return new ResponseEntity<>("User name is already registered", HttpStatus.BAD_REQUEST);
+                if (userRepository.existsByUserName(signupRequest.getUserName())) {
+                    return ResponseUtil.getResponseEntity("03","User name is already registered",HttpStatus.BAD_REQUEST);
                 }
                 User user = modelMapper.map(signupRequest, User.class);
                 user.setPassword(encoder.encode(signupRequest.getPassword()));
@@ -71,13 +73,16 @@ public class UserServiceImpl implements UserService {
                 userRepository.save(user);
 
             }else {
-                return new ResponseEntity<>("Invalid Data",HttpStatus.BAD_REQUEST);
+                return ResponseUtil.getResponseEntity("04","Invalid Data",HttpStatus.BAD_REQUEST);
+
+
             }
         }catch (Exception e){
             e.printStackTrace();
-            return new ResponseEntity<>("Something Went Wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseUtil.getResponseEntity("05","Something Went Wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+
         }
-        return new ResponseEntity<>("Register client successfully", HttpStatus.OK);
+        return ResponseUtil.getResponseEntity("00","Register client successfully", HttpStatus.OK);
     }
 
 
@@ -88,11 +93,15 @@ public class UserServiceImpl implements UserService {
 
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUserName(), loginRequest.getPassword()));
             String jwt = jwtUtil.generateToken(customUserDetailsService.getUserDetail());
+            User user = customUserDetailsService.getUserDetail();
+            UserDTO userDTO = modelMapper.map(user,UserDTO.class);
             JwtResponse response = new JwtResponse();
-            response.setJwt(jwt);
+            response.setJwtToken(jwt);
+            response.setUserDTO(userDTO);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }catch (AuthenticationException exception) {
-            return new ResponseEntity<>("Wrong login name or password.", HttpStatus.BAD_REQUEST);
+            return ResponseUtil.getResponseEntity("01","Sai tên đăng nhập hoặc mật khẩu",HttpStatus.UNAUTHORIZED);
+
         }
     }
 
