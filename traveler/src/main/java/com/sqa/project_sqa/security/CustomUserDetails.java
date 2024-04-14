@@ -15,7 +15,7 @@ import java.util.Collections;
 @AllArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
-    private int userId;
+    private int id;
     private String name;
     private String email;
     private String userName;
@@ -32,7 +32,7 @@ public class CustomUserDetails implements UserDetails {
     public static CustomUserDetails mapUserToUserDetail(User user) {
         GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().name());
         return new CustomUserDetails(
-                user.getUserId(),
+                user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getUserName(),
