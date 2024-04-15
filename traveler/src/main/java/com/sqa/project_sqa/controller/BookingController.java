@@ -40,6 +40,10 @@ public class BookingController {
     public ResponseEntity<String> createBooking(@RequestBody BookingRequest bookingRequest) {
 
         try {
+            List<Booking> bookingList = bookingService.getBookingByTimeAndRoom(bookingRequest);
+            if (!bookingList.isEmpty()) {
+                return ResponseUtil.getResponseEntity("05","Phòng không còn trống trong khoảng thời gian này", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
             bookingService.createBooking(bookingRequest);
             return ResponseEntity.ok("Tạo mới booking thành công");
         } catch (Exception e){

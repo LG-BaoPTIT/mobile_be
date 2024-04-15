@@ -12,6 +12,7 @@ import com.sqa.project_sqa.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,5 +80,13 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public void updateBooking(Booking booking) {
         bookingRepository.save(booking);
+    }
+
+    @Override
+    public List<Booking> getBookingByTimeAndRoom(BookingRequest bookingRequest) {
+        int roomId = bookingRequest.getRoomId();
+        Date checkInDate = bookingRequest.getCheckInDate();
+        Date checkOutDate = bookingRequest.getCheckOutDate();
+        return bookingRepository.findToCheckCreateBooking(roomId,checkInDate,checkOutDate);
     }
 }
