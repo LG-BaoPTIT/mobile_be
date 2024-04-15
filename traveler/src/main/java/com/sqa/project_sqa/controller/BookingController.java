@@ -58,6 +58,16 @@ public class BookingController {
         if (booking == null) {
             return ResponseEntity.notFound().build();
         }
+        List<Booking> bookingList = bookingService.getBookingByTimeAndRoom(bookingRequest);
+        int length = bookingList.size();
+        for (Booking b:bookingList) {
+            if (b.getId() == bookingId) {
+                length--;
+            }
+        }
+        if (length > 0) {
+            return ResponseUtil.getResponseEntity("05","Phòng không còn trống trong khoảng thời gian này", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         if (!booking.getStatus().equals("Chưa thanh toán")) {
             return ResponseEntity.badRequest().body("Không thể chỉnh sửa booking này");
         }
